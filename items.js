@@ -127,6 +127,7 @@ function ItemDAO(database) {
          *
          */
         // console.log(category);
+       //console.log(page);
         var pageItems = [];
         if(category != 'All'){
         pageItems = this.db.collection("item").find({category: category}).sort({_id: 1}).skip(page > 0 ? ((page)*itemsPerPage) : 0).limit(itemsPerPage).toArray().then(function(itens) {
@@ -264,8 +265,8 @@ function ItemDAO(database) {
          *
          */
 
-        console.log("page: "+ page);
-        console.log("itensPerPage: "+ itemsPerPage);
+       // console.log("page: "+ page);
+       // console.log("itensPerPage: "+ itemsPerPage);
         //console.log("query: "+ query);
         var getValue= query;
         var regexValue='\.*'+getValue+'\.';
@@ -306,7 +307,7 @@ function ItemDAO(database) {
     ]
 
     ).toArray().then(function(itens) {
-            console.log(itens);
+            //console.log(itens);
             callback(itens);
         });
 
@@ -328,7 +329,32 @@ function ItemDAO(database) {
     this.getNumSearchItems = function(query, callback) {
         "use strict";
 
-        var numItems = 0;
+        //var numItems = 0;
+        var getValue= query;
+        var regexValue='\.*'+getValue+'\.';
+        var items = this.db.collection("item").aggregate(
+
+      [
+       
+
+        {
+            $match: {
+             $or: [{'title': new RegExp(regexValue, 'i')}, {'slogan': new RegExp(regexValue, 'i')}, {'description': new RegExp(regexValue, 'i')}]
+            }
+        },
+         {
+            $sort: {
+            _id: 1
+            }
+        }
+
+    ]
+
+    ).toArray().then(function(nItens) {
+            console.log(nItens);
+            var numItems = nItens.length;
+            callback(numItems);
+        });
 
         /*
         * TODO-lab2B
@@ -343,7 +369,7 @@ function ItemDAO(database) {
         * simply do this in the mongo shell.
         */
 
-        callback(numItems);
+        
     }
 
 

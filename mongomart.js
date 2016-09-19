@@ -96,6 +96,7 @@ MongoClient.connect('mongodb://localhost:27017/mongomart', function(err, db) {
     
     router.get("/search", function(req, res) {
         "use strict";
+       //console.log(req);
 
         var page = req.query.page ? parseInt(req.query.page) : 0;
         var query = req.query.query ? req.query.query : "";
