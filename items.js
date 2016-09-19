@@ -264,12 +264,51 @@ function ItemDAO(database) {
          *
          */
 
-         
-         console.log(query);
-         var items = this.db.collection("item").find({$or: [{'title': {$regex: '/'+query+'/'}},{'slogan': {$regex: /query/}},{'description': {$regex: /query/}}]}).sort({_id: 1}).skip(page > 0 ? ((page)*itemsPerPage) : 0).limit(itemsPerPage).toArray().then(function(itens) {
-               console.log(itens);
-                callback(itens);
-            });
+        console.log("page: "+ page);
+        console.log("itensPerPage: "+ itemsPerPage);
+        //console.log("query: "+ query);
+        var getValue= query;
+        var regexValue='\.*'+getValue+'\.';
+        // var items = this.db.collection("item").find({ $or: [{'title': new RegExp(regexValue, 'i')}, {'slogan': new RegExp(regexValue, 'i')}, {'description': new RegExp(regexValue, 'i')}]}).sort({_id: 1}).skip(page > 0 ? ((page)*itemsPerPage) : 0).limit(itemsPerPage).toArray().then(function(itens) {
+        //     console.log(itens);
+        //     callback(itens);
+        // });
+       
+        var items = this.db.collection("item").aggregate(
+
+    [
+        {
+            $match: {
+            
+            }
+        },
+
+        {
+            $sort: {
+            _id: 1
+            }
+        },
+
+        {
+            $skip: page > 0 ? ((page)*itemsPerPage) : 0
+        },
+
+        {
+            $limit: itemsPerPage
+        },
+
+        {
+            $match: {
+             $or: [{'title': new RegExp(regexValue, 'i')}, {'slogan': new RegExp(regexValue, 'i')}, {'description': new RegExp(regexValue, 'i')}]
+            }
+        },
+
+    ]
+
+    ).toArray().then(function(itens) {
+            console.log(itens);
+            callback(itens);
+        });
 
         // var item = this.createDummyItem();
         // //var items = [];
