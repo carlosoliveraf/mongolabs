@@ -268,7 +268,7 @@ function ItemDAO(database) {
        // console.log("page: "+ page);
        // console.log("itensPerPage: "+ itemsPerPage);
         //console.log("query: "+ query);
-        var regexValue='\.*'+query+'\.';
+        var regexValue=query;
         // var items = this.db.collection("item").find({ $or: [{'title': new RegExp(regexValue, 'i')}, {'slogan': new RegExp(regexValue, 'i')}, {'description': new RegExp(regexValue, 'i')}]}).sort({_id: 1}).skip(page > 0 ? ((page)*itemsPerPage) : 0).limit(itemsPerPage).toArray().then(function(itens) {
         //     console.log(itens);
         //     callback(itens);
@@ -277,11 +277,15 @@ function ItemDAO(database) {
         var items = this.db.collection("item").aggregate(
 
     [
-        // {
-        //     $match: {
-            
-        //     }
-        // },
+        {
+            $match: {
+             $or: [
+                {'title': new RegExp(regexValue, 'gi')}, 
+                {'slogan': new RegExp(regexValue, 'gi')}, 
+                {'description': new RegExp(regexValue, 'gi')}
+                ]
+            }
+        },
 
         {
             $sort: {
@@ -295,17 +299,10 @@ function ItemDAO(database) {
 
         {
             $limit: itemsPerPage
-        },
+        }
 
-        {
-            $match: {
-             $or: [
-                {'title': new RegExp(regexValue, 'gi')}, 
-                {'slogan': new RegExp(regexValue, 'gi')}, 
-                {'description': new RegExp(regexValue, 'gi')}
-                ]
-            }
-        },
+
+        
 
     ]
 
@@ -334,7 +331,7 @@ function ItemDAO(database) {
 
         //var numItems = 0;
         var getValue= query;
-        var regexValue='\.*'+getValue+'\.';
+        var regexValue= getValue;
         var items = this.db.collection("item").aggregate(
 
       [
