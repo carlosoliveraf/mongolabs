@@ -268,8 +268,7 @@ function ItemDAO(database) {
        // console.log("page: "+ page);
        // console.log("itensPerPage: "+ itemsPerPage);
         //console.log("query: "+ query);
-        var getValue= query;
-        var regexValue='\.*'+getValue+'\.';
+        var regexValue='\.*'+query+'\.';
         // var items = this.db.collection("item").find({ $or: [{'title': new RegExp(regexValue, 'i')}, {'slogan': new RegExp(regexValue, 'i')}, {'description': new RegExp(regexValue, 'i')}]}).sort({_id: 1}).skip(page > 0 ? ((page)*itemsPerPage) : 0).limit(itemsPerPage).toArray().then(function(itens) {
         //     console.log(itens);
         //     callback(itens);
@@ -278,11 +277,11 @@ function ItemDAO(database) {
         var items = this.db.collection("item").aggregate(
 
     [
-        {
-            $match: {
+        // {
+        //     $match: {
             
-            }
-        },
+        //     }
+        // },
 
         {
             $sort: {
@@ -300,14 +299,18 @@ function ItemDAO(database) {
 
         {
             $match: {
-             $or: [{'title': new RegExp(regexValue, 'i')}, {'slogan': new RegExp(regexValue, 'i')}, {'description': new RegExp(regexValue, 'i')}]
+             $or: [
+                {'title': new RegExp(regexValue, 'gi')}, 
+                {'slogan': new RegExp(regexValue, 'gi')}, 
+                {'description': new RegExp(regexValue, 'gi')}
+                ]
             }
         },
 
     ]
 
     ).toArray().then(function(itens) {
-            //console.log(itens);
+            console.log(itens);
             callback(itens);
         });
 
@@ -339,7 +342,7 @@ function ItemDAO(database) {
 
         {
             $match: {
-             $or: [{'title': new RegExp(regexValue, 'i')}, {'slogan': new RegExp(regexValue, 'i')}, {'description': new RegExp(regexValue, 'i')}]
+             $or: [{'title': new RegExp(regexValue, 'gi')}, {'slogan': new RegExp(regexValue, 'gi')}, {'description': new RegExp(regexValue, 'gi')}]
             }
         },
          {
@@ -351,7 +354,6 @@ function ItemDAO(database) {
     ]
 
     ).toArray().then(function(nItens) {
-            console.log(nItens);
             var numItems = nItens.length;
             callback(numItems);
         });
@@ -386,14 +388,16 @@ function ItemDAO(database) {
          *
          */
 
-        var item = this.createDummyItem();
+        var item = this.db.collection("item").findOne({'_id': itemId}).then(function(item) {
+                callback(item);
+            });
 
         // TODO-lab3 Replace all code above (in this method).
 
         // TODO Include the following line in the appropriate
         // place within your code to pass the matching item
         // to the callback.
-        callback(item);
+       // callback(item);
     }
 
 
@@ -423,23 +427,34 @@ function ItemDAO(database) {
          * "name", "comment", "stars", and "date".
          *
          */
-
-        var reviewDoc = {
+         var reviewDoc = {
             name: name,
             comment: comment,
             stars: stars,
             date: Date.now()
         }
+        //console.log(reviewDoc);
+      //  console.log(itemId);
+
+         var item = this.db.collection("item").update({'_id': itemId},{$push: {'reviews': reviewDoc}}).then(function(itemUpdated) {
+                    callback(itemUpdated)
+                });
+            
+     
+              
+
+
+        
 
         // TODO replace the following two lines with your code that will
         // update the document with a new review.
-        var doc = this.createDummyItem();
-        doc.reviews = [reviewDoc];
+      //  var doc = this.createDummyItem();
+      //  doc.reviews = [reviewDoc];
 
         // TODO Include the following line in the appropriate
         // place within your code to pass the updated doc to the
         // callback.
-        callback(doc);
+     //   callback(doc);
     }
 
 
